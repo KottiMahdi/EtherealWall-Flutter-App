@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 import '../../../../core/errors/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/wallpaper.dart';
@@ -22,7 +23,7 @@ class GetWallpapersByCategory
   }
 }
 
-class GetWallpapersByCategoryParams {
+class GetWallpapersByCategoryParams extends Equatable {
   final String category;
   final int page;
   final int perPage;
@@ -32,4 +33,7 @@ class GetWallpapersByCategoryParams {
     this.page = 1,
     this.perPage = 20,
   });
+
+  @override
+  List<Object> get props => [category, page, perPage];
 }

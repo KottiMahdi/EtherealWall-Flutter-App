@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -97,9 +98,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Stack(
                               children: [
                                 Positioned.fill(
-                                  child: Image.network(
-                                    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
+                                  child: CachedNetworkImage(
+                                    imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
                                     fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      color: AppColors.surfaceContainerLow,
+                                    ),
+                                    errorWidget: (context, url, error) => Container(
+                                      color: AppColors.surfaceContainerLow,
+                                      child: const Icon(Icons.broken_image_rounded),
+                                    ),
                                   ),
                                 ),
                                 Positioned.fill(
