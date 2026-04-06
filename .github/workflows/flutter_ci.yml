@@ -28,7 +28,7 @@ jobs:
       - name: 🧪 Run tests
         run: flutter test
 
-      - name: 🏗 Build APK
+      - name: 🏗 Build APK-
         run: flutter build apk --release
 
       - name: 📤 Upload APK

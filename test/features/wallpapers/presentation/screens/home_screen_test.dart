@@ -9,7 +9,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 import 'package:bloc_test/bloc_test.dart';
 
-class MockWallpaperCubit extends MockCubit<WallpaperState> implements WallpaperCubit {}
+class MockWallpaperCubit extends MockCubit<WallpaperState>
+    implements WallpaperCubit {}
 
 void main() {
   late MockWallpaperCubit mockCubit;
@@ -44,29 +45,26 @@ void main() {
     );
   }
 
-  void _setupView(WidgetTester tester) {
+  void setupView(WidgetTester tester) {
     tester.view.physicalSize = const Size(1080, 5000); // Very tall viewport
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
   }
 
-  testWidgets(
-    'should display Daily Muse header always',
-    (tester) async {
-      _setupView(tester);
-      when(() => mockCubit.state).thenReturn(WallpaperInitial());
+  testWidgets('should display Daily Muse header always', (tester) async {
+    setupView(tester);
+    when(() => mockCubit.state).thenReturn(WallpaperInitial());
 
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pump();
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pump();
 
-      expect(find.text('Daily Muse'), findsOneWidget);
-    },
-  );
+    expect(find.text('Daily Muse'), findsOneWidget);
+  });
 
   testWidgets(
     'should display CircularProgressIndicator when state is WallpaperLoading',
     (tester) async {
-      _setupView(tester);
+      setupView(tester);
       when(() => mockCubit.state).thenReturn(WallpaperLoading());
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -76,51 +74,57 @@ void main() {
     },
   );
 
-  testWidgets(
-    'should display error message when state is WallpaperError',
-    (tester) async {
-      _setupView(tester);
-      const errorMessage = 'Network Error';
-      when(() => mockCubit.state).thenReturn(const WallpaperError(message: errorMessage));
+  testWidgets('should display error message when state is WallpaperError', (
+    tester,
+  ) async {
+    setupView(tester);
+    const errorMessage = 'Network Error';
+    when(
+      () => mockCubit.state,
+    ).thenReturn(const WallpaperError(message: errorMessage));
+
+    await tester.pumpWidget(createWidgetUnderTest());
+    await tester.pump();
+
+    expect(find.text(errorMessage), findsOneWidget);
+  });
+
+  testWidgets('should display wallpapers when state is WallpaperLoaded', (
+    tester,
+  ) async {
+    setupView(tester);
+    await mockNetworkImages(() async {
+      when(
+        () => mockCubit.state,
+      ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
 
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pump();
+      for (int i = 0; i < 5; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
 
-      expect(find.text(errorMessage), findsOneWidget);
-    },
-  );
-
-  testWidgets(
-    'should display wallpapers when state is WallpaperLoaded',
-    (tester) async {
-      _setupView(tester);
-      await mockNetworkImages(() async {
-        when(() => mockCubit.state).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
-
-        await tester.pumpWidget(createWidgetUnderTest());
-        for (int i = 0; i < 5; i++) {
-          await tester.pump(const Duration(milliseconds: 100));
-        }
-
-        expect(find.text('Nature Art'), findsOneWidget);
-      });
-    },
-  );
+      expect(find.text('Nature Art'), findsOneWidget);
+    });
+  });
 
   testWidgets(
     'should call fetchWallpapersByCategory when a category chip is tapped',
     (tester) async {
-      _setupView(tester);
+      setupView(tester);
       await mockNetworkImages(() async {
-        when(() => mockCubit.state).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
-        when(() => mockCubit.fetchWallpapersByCategory(any())).thenAnswer((_) async {});
+        when(
+          () => mockCubit.state,
+        ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
+        when(
+          () => mockCubit.fetchWallpapersByCategory(any()),
+        ).thenAnswer((_) async {});
 
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
         final natureChip = find.text('Nature');
         expect(natureChip, findsOneWidget);
-        
+
         await tester.tap(natureChip);
         await tester.pump();
 
