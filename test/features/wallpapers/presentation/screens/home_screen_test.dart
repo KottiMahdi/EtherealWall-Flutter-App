@@ -8,15 +8,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 import 'package:bloc_test/bloc_test.dart';
+import 'package:go_router/go_router.dart';
 
 class MockWallpaperCubit extends MockCubit<WallpaperState>
     implements WallpaperCubit {}
 
+class MockGoRouter extends Mock implements GoRouter {}
+
 void main() {
   late MockWallpaperCubit mockCubit;
+  late MockGoRouter mockRouter;
 
   setUp(() {
     mockCubit = MockWallpaperCubit();
+    mockRouter = MockGoRouter();
   });
 
   tearDown(() {
@@ -38,15 +43,18 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return MaterialApp(
-      home: BlocProvider<WallpaperCubit>.value(
-        value: mockCubit,
-        child: const HomeScreen(),
+      home: InheritedGoRouter(
+        goRouter: mockRouter,
+        child: BlocProvider<WallpaperCubit>.value(
+          value: mockCubit,
+          child: const HomeScreen(),
+        ),
       ),
     );
   }
 
   void setupView(WidgetTester tester) {
-    tester.view.physicalSize = const Size(1080, 5000); // Very tall viewport
+    tester.view.physicalSize = const Size(1080, 5000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
   }
@@ -108,16 +116,16 @@ void main() {
   });
 
   testWidgets(
-    'should call fetchWallpapersByCategory when a category chip is tapped',
+    'should navigate to category screen when a category chip is tapped',
     (tester) async {
       setupView(tester);
       await mockNetworkImages(() async {
         when(
           () => mockCubit.state,
         ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
-        when(
-          () => mockCubit.fetchWallpapersByCategory(any()),
-        ).thenAnswer((_) async {});
+        
+        // Mock the push call
+        when(() => mockRouter.push(any())).thenAnswer((_) async => null);
 
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
@@ -128,7 +136,32 @@ void main() {
         await tester.tap(natureChip);
         await tester.pump();
 
-        verify(() => mockCubit.fetchWallpapersByCategory('Nature')).called(1);
+        // Verify that it pushed the correct route
+        verify(() => mockRouter.push('/category/Nature')).called(1);
+      });
+    },
+  );
+
+  testWidgets(
+    'should call fetchWallpapers when "All" category chip is tapped',
+    (tester) async {
+      setupView(tester);
+      await mockNetworkImages(() async {
+        when(
+          () => mockCubit.state,
+        ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
+        when(() => mockCubit.fetchWallpapers()).thenAnswer((_) async {});
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        final allChip = find.text('All');
+        expect(allChip, findsOneWidget);
+
+        await tester.tap(allChip);
+        await tester.pump();
+
+        verify(() => mockCubit.fetchWallpapers()).called(1);
       });
     },
   );

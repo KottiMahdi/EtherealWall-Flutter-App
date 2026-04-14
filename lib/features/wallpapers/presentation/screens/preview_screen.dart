@@ -192,11 +192,22 @@ class PreviewScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      _buildActionIcon(Icons.download_rounded, onTap: () {}),
+                      _buildActionIcon(
+                        Icons.download_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Download feature coming soon!"),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Setting wallpaper coming soon!"),
+                            ),
+                          ),
                           child: Container(
                             height: 56,
                             decoration: BoxDecoration(
@@ -233,7 +244,14 @@ class PreviewScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      _buildActionIcon(Icons.share_rounded, onTap: () {}),
+                      _buildActionIcon(
+                        Icons.share_rounded,
+                        onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Share feature coming soon!"),
+                          ),
+                        ),
+                      ),
                       const SizedBox(width: 8),
                     ],
                   ),

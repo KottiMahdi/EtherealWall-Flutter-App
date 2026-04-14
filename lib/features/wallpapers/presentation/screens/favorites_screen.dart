@@ -6,17 +6,30 @@ import '../cubit/favorites_cubit.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../widgets/ethereal_bottom_bar.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Refresh favorites when this screen is opened
-    context.read<FavoritesCubit>().loadFavorites();
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
 
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Refresh favorites when this screen is first opened
+    context.read<FavoritesCubit>().loadFavorites();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Favorites', style: AppTextStyles.headlineSmall),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => context.go('/'),
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),

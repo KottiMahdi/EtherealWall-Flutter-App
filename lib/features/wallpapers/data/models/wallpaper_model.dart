@@ -31,6 +31,19 @@ class WallpaperModel extends Wallpaper {
     );
   }
 
+  factory WallpaperModel.fromEntity(Wallpaper wallpaper) {
+    return WallpaperModel(
+      id: wallpaper.id,
+      title: wallpaper.title,
+      imageUrl: wallpaper.imageUrl,
+      thumbnailUrl: wallpaper.thumbnailUrl,
+      category: wallpaper.category,
+      photographer: wallpaper.photographer,
+      width: wallpaper.width,
+      height: wallpaper.height,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -69,16 +69,7 @@ class WallpapersRepositoryImpl implements WallpapersRepository {
   @override
   Future<Either<Failure, void>> saveFavorite(Wallpaper wallpaper) async {
     try {
-      final model = WallpaperModel(
-        id: wallpaper.id,
-        title: wallpaper.title,
-        imageUrl: wallpaper.imageUrl,
-        thumbnailUrl: wallpaper.thumbnailUrl,
-        category: wallpaper.category,
-        photographer: wallpaper.photographer,
-        width: wallpaper.width,
-        height: wallpaper.height,
-      );
+      final model = WallpaperModel.fromEntity(wallpaper);
       await localDataSource.saveFavorite(model);
       return const Right(null);
     } on CacheException catch (e) {

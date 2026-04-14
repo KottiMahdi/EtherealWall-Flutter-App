@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 
-enum NavItem { home, browse, favorites, profile }
+enum NavItem { home, browse, favorites, trending }
 
 class EtherealBottomBar extends StatelessWidget {
   final NavItem activeItem;
@@ -49,7 +49,7 @@ class EtherealBottomBar extends StatelessWidget {
                       context,
                       Icons.grid_view_rounded,
                       activeItem == NavItem.browse,
-                      () => context.go('/category/Trending'),
+                      () => context.go('/category/Explore'),
                     ),
                     _buildNavItem(
                       context,
@@ -59,9 +59,9 @@ class EtherealBottomBar extends StatelessWidget {
                     ),
                     _buildNavItem(
                       context,
-                      Icons.person_rounded,
-                      activeItem == NavItem.profile,
-                      () {},
+                      Icons.local_fire_department_rounded,
+                      activeItem == NavItem.trending,
+                      () => context.go('/category/Trending'),
                     ),
                   ],
                 ),

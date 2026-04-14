@@ -3,9 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'app/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/wallpapers/presentation/cubit/favorites_cubit.dart';
-import 'features/wallpapers/presentation/cubit/wallpaper_cubit.dart';
-import 'injection_container.dart' as di;
-import 'injection_container.dart';
+import 'core/di/injection_container.dart' as di;
+import 'core/di/injection_container.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +19,6 @@ class EtherealWallApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => sl<WallpaperCubit>()..fetchWallpapers()),
         BlocProvider(create: (_) => sl<FavoritesCubit>()..loadFavorites()),
       ],
       child: MaterialApp.router(
