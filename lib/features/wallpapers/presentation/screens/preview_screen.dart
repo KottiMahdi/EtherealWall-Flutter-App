@@ -257,16 +257,6 @@ class PreviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIndicatorDot() {
-    return Container(
-      width: 8,
-      height: 4,
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(2),
-      ),
-    );
-  }
 
   Widget _buildActionIcon(IconData icon, {Color? color, VoidCallback? onTap}) {
     return GestureDetector(
