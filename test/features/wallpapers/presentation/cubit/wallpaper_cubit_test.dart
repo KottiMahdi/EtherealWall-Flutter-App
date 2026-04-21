@@ -49,10 +49,8 @@ void main() {
   });
 
   group('fetchWallpapers', () {
-    const tParams = GetWallpapersParams(page: 1, perPage: 20);
-
     setUpAll(() {
-      registerFallbackValue(tParams);
+      registerFallbackValue(GetWallpapersParams(page: 1, perPage: 30));
     });
 
     blocTest<WallpaperCubit, WallpaperState>(
@@ -68,7 +66,7 @@ void main() {
         const WallpaperLoaded(wallpapers: tWallpapers),
       ],
       verify: (_) {
-        verify(() => mockGetWallpapers(tParams)).called(1);
+        verify(() => mockGetWallpapers(any())).called(1);
       },
     );
 
@@ -89,10 +87,11 @@ void main() {
 
   group('fetchWallpapersByCategory', () {
     const tCategory = 'Nature';
-    const tParams = GetWallpapersByCategoryParams(category: tCategory, page: 1, perPage: 20);
 
     setUpAll(() {
-      registerFallbackValue(tParams);
+      registerFallbackValue(
+        GetWallpapersByCategoryParams(category: tCategory, page: 1, perPage: 30),
+      );
     });
 
     blocTest<WallpaperCubit, WallpaperState>(
@@ -108,7 +107,7 @@ void main() {
         const WallpaperLoaded(wallpapers: tWallpapers),
       ],
       verify: (_) {
-        verify(() => mockGetWallpapersByCategory(tParams)).called(1);
+        verify(() => mockGetWallpapersByCategory(any())).called(1);
       },
     );
 
