@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/entities/wallpaper.dart';
+import '../cubit/favorites_cubit.dart';
 
 class WallpaperGridItem extends StatelessWidget {
   final Wallpaper wallpaper;
@@ -49,17 +51,31 @@ class WallpaperGridItem extends StatelessWidget {
                   Positioned(
                     top: 12,
                     right: 12,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.favorite_rounded,
-                        size: 16,
-                        color: AppColors.primary,
-                      ),
+                    child: BlocBuilder<FavoritesCubit, FavoritesState>(
+                      builder: (context, state) {
+                        bool isFavorite = false;
+                        if (state is FavoritesLoaded) {
+                          isFavorite = state.favorites.any((f) => f.id == wallpaper.id);
+                        }
+                        
+                        return GestureDetector(
+                          onTap: () {
+                            context.read<FavoritesCubit>().toggleWallpaperFavorite(wallpaper);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],

@@ -4,6 +4,8 @@ import 'package:ethereal_wall/features/wallpapers/presentation/cubit/wallpaper_s
 import 'package:ethereal_wall/features/wallpapers/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ethereal_wall/features/wallpapers/presentation/cubit/favorites_cubit.dart';
+import 'package:ethereal_wall/core/di/injection_container.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
@@ -13,15 +15,31 @@ import 'package:go_router/go_router.dart';
 class MockWallpaperCubit extends MockCubit<WallpaperState>
     implements WallpaperCubit {}
 
+class MockFavoritesCubit extends MockCubit<FavoritesState>
+    implements FavoritesCubit {}
+
 class MockGoRouter extends Mock implements GoRouter {}
 
 void main() {
   late MockWallpaperCubit mockCubit;
+  late MockFavoritesCubit mockFavoritesCubit;
   late MockGoRouter mockRouter;
 
   setUp(() {
     mockCubit = MockWallpaperCubit();
+    mockFavoritesCubit = MockFavoritesCubit();
     mockRouter = MockGoRouter();
+
+    // Setup Service Locator (sl)
+    if (sl.isRegistered<WallpaperCubit>()) {
+      sl.unregister<WallpaperCubit>();
+    }
+    sl.registerFactory<WallpaperCubit>(() => mockCubit);
+
+    // Stub mandatory calls
+    when(() => mockCubit.fetchWallpapers()).thenAnswer((_) async {});
+    when(() => mockFavoritesCubit.loadFavorites()).thenAnswer((_) async {});
+    when(() => mockFavoritesCubit.state).thenReturn(FavoritesInitial());
   });
 
   tearDown(() {
@@ -45,8 +63,8 @@ void main() {
     return MaterialApp(
       home: InheritedGoRouter(
         goRouter: mockRouter,
-        child: BlocProvider<WallpaperCubit>.value(
-          value: mockCubit,
+        child: BlocProvider<FavoritesCubit>.value(
+          value: mockFavoritesCubit,
           child: const HomeScreen(),
         ),
       ),
@@ -107,16 +125,14 @@ void main() {
       ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
 
       await tester.pumpWidget(createWidgetUnderTest());
-      for (int i = 0; i < 5; i++) {
-        await tester.pump(const Duration(milliseconds: 100));
-      }
+      await tester.pumpAndSettle();
 
-      expect(find.text('Nature Art'), findsOneWidget);
+      expect(find.text('Nature Art'), findsAtLeast(1));
     });
   });
 
   testWidgets(
-    'should navigate to category screen when a category chip is tapped',
+    'should navigate to preview screen when a wallpaper is tapped',
     (tester) async {
       setupView(tester);
       await mockNetworkImages(() async {
@@ -124,44 +140,17 @@ void main() {
           () => mockCubit.state,
         ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
         
-        // Mock the push call
-        when(() => mockRouter.push(any())).thenAnswer((_) async => null);
+        when(() => mockRouter.push(any(), extra: any(named: 'extra')))
+            .thenAnswer((_) async => null);
 
         await tester.pumpWidget(createWidgetUnderTest());
         await tester.pumpAndSettle();
 
-        final natureChip = find.text('Nature');
-        expect(natureChip, findsOneWidget);
-
-        await tester.tap(natureChip);
+        final wallpaperCard = find.text('Nature Art').first;
+        await tester.tap(wallpaperCard);
         await tester.pump();
 
-        // Verify that it pushed the correct route
-        verify(() => mockRouter.push('/category/Nature')).called(1);
-      });
-    },
-  );
-
-  testWidgets(
-    'should call fetchWallpapers when "All" category chip is tapped',
-    (tester) async {
-      setupView(tester);
-      await mockNetworkImages(() async {
-        when(
-          () => mockCubit.state,
-        ).thenReturn(const WallpaperLoaded(wallpapers: tWallpapers));
-        when(() => mockCubit.fetchWallpapers()).thenAnswer((_) async {});
-
-        await tester.pumpWidget(createWidgetUnderTest());
-        await tester.pumpAndSettle();
-
-        final allChip = find.text('All');
-        expect(allChip, findsOneWidget);
-
-        await tester.tap(allChip);
-        await tester.pump();
-
-        verify(() => mockCubit.fetchWallpapers()).called(1);
+        verify(() => mockRouter.push('/preview', extra: tWallpapers[0])).called(1);
       });
     },
   );

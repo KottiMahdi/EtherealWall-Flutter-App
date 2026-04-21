@@ -115,38 +115,11 @@ class PreviewScreen extends StatelessWidget {
               children: [
                 Text(
                   wallpaper.title,
-                  style: AppTextStyles.headlineLarge.copyWith(
+                  style: AppTextStyles.headlineSmall.copyWith(
                     color: Colors.white,
-                    fontSize: 32,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    fontSize: 18,
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Digital Art by ${wallpaper.photographer} • 8K Ultra HD',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Swipe Indicators
-                Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    _buildIndicatorDot(),
-                    const SizedBox(width: 6),
-                    _buildIndicatorDot(),
-                  ],
                 ),
               ],
             ),
@@ -209,7 +182,7 @@ class PreviewScreen extends StatelessWidget {
                             ),
                           ),
                           child: Container(
-                            height: 56,
+                            height: 48,
                             decoration: BoxDecoration(
                               gradient: AppColors.primaryGradient,
                               borderRadius: BorderRadius.circular(100),

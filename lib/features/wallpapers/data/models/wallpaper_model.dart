@@ -16,8 +16,8 @@ class WallpaperModel extends Wallpaper {
     Map<String, dynamic> json, {
     String? category,
   }) {
-    // Pexels JSON mapping
-    final src = json['src'] as Map<String, dynamic>? ?? {};
+    // Safe mapping for both Remote API and Hive storage
+    final src = json['src'] != null ? Map<String, dynamic>.from(json['src'] as Map) : {};
 
     return WallpaperModel(
       id: json['id']?.toString() ?? '',

@@ -6,6 +6,7 @@ import '../../features/wallpapers/presentation/screens/category_screen.dart';
 import '../../features/wallpapers/presentation/screens/favorites_screen.dart';
 import '../../features/wallpapers/presentation/screens/home_screen.dart';
 import '../../features/wallpapers/presentation/screens/preview_screen.dart';
+import 'main_shell.dart';
 
 abstract class AppRouter {
   static const String home = '/';
@@ -17,18 +18,36 @@ abstract class AppRouter {
     initialLocation: home,
     debugLogDiagnostics: true,
     routes: [
-      GoRoute(
-        path: home,
-        name: 'home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/category/:name',
-        name: 'category',
-        builder: (context, state) {
-          final name = state.pathParameters['name']!;
-          return CategoryScreen(category: name);
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainShell(
+            stateUri: state.uri.toString(),
+            child: child,
+          );
         },
+        routes: [
+          GoRoute(
+            path: home,
+            name: 'home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/category/:name',
+            name: 'category',
+            builder: (context, state) {
+              final name = state.pathParameters['name']!;
+              return CategoryScreen(
+                key: ValueKey(name),
+                category: name,
+              );
+            },
+          ),
+          GoRoute(
+            path: favorites,
+            name: 'favorites',
+            builder: (context, state) => const FavoritesScreen(),
+          ),
+        ],
       ),
       GoRoute(
         path: preview,
@@ -37,11 +56,6 @@ abstract class AppRouter {
           final wallpaper = state.extra as Wallpaper;
           return PreviewScreen(wallpaper: wallpaper);
         },
-      ),
-      GoRoute(
-        path: favorites,
-        name: 'favorites',
-        builder: (context, state) => const FavoritesScreen(),
       ),
     ],
     errorBuilder: (context, state) =>

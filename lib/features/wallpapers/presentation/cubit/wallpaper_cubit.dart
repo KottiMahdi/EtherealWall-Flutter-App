@@ -12,11 +12,14 @@ class WallpaperCubit extends Cubit<WallpaperState> {
     required this.getWallpapersByCategory,
   }) : super(WallpaperInitial());
 
-  Future<void> fetchWallpapers({int page = 1, int perPage = 20}) async {
+  Future<void> fetchWallpapers({int? page, int perPage = 30}) async {
     emit(WallpaperLoading());
 
+    // Randomize page on refresh to bring "latest" and fresh variety
+    final targetPage = page ?? (DateTime.now().millisecond % 50) + 1;
+
     final result = await getWallpapers(
-      GetWallpapersParams(page: page, perPage: perPage),
+      GetWallpapersParams(page: targetPage, perPage: perPage),
     );
 
     result.fold(
@@ -27,15 +30,18 @@ class WallpaperCubit extends Cubit<WallpaperState> {
 
   Future<void> fetchWallpapersByCategory(
     String category, {
-    int page = 1,
-    int perPage = 20,
+    int? page,
+    int perPage = 30,
   }) async {
     emit(WallpaperLoading());
+
+    // Randomize page on category refresh for variety
+    final targetPage = page ?? (DateTime.now().millisecond % 20) + 1;
 
     final result = await getWallpapersByCategory(
       GetWallpapersByCategoryParams(
         category: category,
-        page: page,
+        page: targetPage,
         perPage: perPage,
       ),
     );

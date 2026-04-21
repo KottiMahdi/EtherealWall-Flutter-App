@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/entities/wallpaper.dart';
+import '../cubit/favorites_cubit.dart';
 
 class HeroCarousel extends StatefulWidget {
   final List<Wallpaper> wallpapers;
@@ -88,9 +90,8 @@ class _HeroCarouselState extends State<HeroCarousel> {
               child: CachedNetworkImage(
                 imageUrl: wallpaper.imageUrl,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: AppColors.surfaceContainerLow,
-                ),
+                placeholder: (context, url) =>
+                    Container(color: AppColors.surfaceContainerLow),
                 errorWidget: (context, url, error) => Container(
                   color: AppColors.surfaceContainerLow,
                   child: const Icon(Icons.broken_image_rounded),
@@ -112,8 +113,49 @@ class _HeroCarouselState extends State<HeroCarousel> {
               ),
             ),
             Positioned(
+              top: 32,
+              right: 32,
+              child: BlocBuilder<FavoritesCubit, FavoritesState>(
+                builder: (context, state) {
+                  bool isFavorite = false;
+                  if (state is FavoritesLoaded) {
+                    isFavorite = state.favorites.any(
+                      (f) => f.id == wallpaper.id,
+                    );
+                  }
+
+                  return GestureDetector(
+                    onTap: () {
+                      context.read<FavoritesCubit>().toggleWallpaperFavorite(
+                        wallpaper,
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        isFavorite
+                            ? Icons.favorite_rounded
+                            : Icons.favorite_border_rounded,
+                        size: 24,
+                        color: Colors.white,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Positioned(
               bottom: 32,
               left: 32,
+              right: 32,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -139,10 +181,12 @@ class _HeroCarouselState extends State<HeroCarousel> {
                   const SizedBox(height: 12),
                   Text(
                     wallpaper.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.headlineSmall.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
-                      fontSize: 28,
+                      fontSize: 22,
                     ),
                   ),
                 ],
