@@ -39,8 +39,18 @@ class EditorialWallpaperCard extends StatelessWidget {
             CachedNetworkImage(
               imageUrl: imageUrl,
               fit: BoxFit.cover,
-              placeholder:
-                  (_, __) => Container(color: AppColors.surfaceContainerHigh),
+              placeholder: (_, __) =>
+                  Container(color: AppColors.surfaceContainerHigh),
+              errorWidget: (context, url, error) => Container(
+                color: AppColors.surfaceContainerHigh,
+                child: Center(
+                  child: Icon(
+                    Icons.broken_image_rounded,
+                    size: 40,
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.3),
+                  ),
+                ),
+              ),
             ),
             // Bottom Gradient
             Positioned.fill(

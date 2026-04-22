@@ -11,6 +11,7 @@ import '../cubit/wallpaper_cubit.dart';
 import '../cubit/wallpaper_state.dart';
 import '../widgets/hero_carousel.dart';
 import '../widgets/wallpapers_masonry_grid.dart';
+import '../../../../core/widgets/state_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -123,22 +124,25 @@ class _HomeScreenState extends State<HomeScreen> {
     if (state is WallpaperLoaded) {
       return HeroCarousel(wallpapers: state.wallpapers);
     }
-    return Container(
-      height: 420,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: const Center(child: CircularProgressIndicator.adaptive()),
-    );
+    return const EtherealLoading();
   }
 
   Widget _buildGallery(WallpaperState state) {
     if (state is WallpaperLoaded) {
       return WallpapersMasonryGrid(wallpapers: state.wallpapers);
     } else if (state is WallpaperError) {
-      return SliverFillRemaining(child: Center(child: Text(state.message)));
+      return SliverFillRemaining(
+        child: EtherealError(
+          message: state.message,
+          onRetry: () => context.read<WallpaperCubit>().fetchWallpapers(),
+        ),
+      );
     }
-    return const SliverToBoxAdapter(child: SizedBox());
+    return const SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.only(top: 100),
+        child: EtherealLoading(),
+      ),
+    );
   }
 }

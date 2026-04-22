@@ -45,7 +45,18 @@ class WallpaperGridItem extends StatelessWidget {
                         Container(color: AppColors.surfaceContainerHighest),
                     errorWidget: (context, url, error) => Container(
                       color: AppColors.surfaceContainerHighest,
-                      child: const Icon(Icons.broken_image_outlined, size: 32),
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.broken_image_rounded,
+                              size: 32,
+                              color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                   Positioned(

@@ -94,7 +94,25 @@ class _HeroCarouselState extends State<HeroCarousel> {
                     Container(color: AppColors.surfaceContainerLow),
                 errorWidget: (context, url, error) => Container(
                   color: AppColors.surfaceContainerLow,
-                  child: const Icon(Icons.broken_image_rounded),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.broken_image_rounded,
+                          size: 48,
+                          color: AppColors.onSurfaceVariant.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Failed to load image',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../cubit/favorites_cubit.dart';
 import '../widgets/wallpaper_grid_item.dart';
+import '../../../../core/widgets/state_widgets.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -58,11 +59,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       body: BlocBuilder<FavoritesCubit, FavoritesState>(
         builder: (context, state) {
           if (state is FavoritesLoading) {
-            return const Center(
-              child: CircularProgressIndicator.adaptive(),
-            );
+            return const EtherealLoading();
           } else if (state is FavoritesError) {
-            return Center(child: Text(state.message));
+            return EtherealError(
+              message: state.message,
+              onRetry: () => context.read<FavoritesCubit>().loadFavorites(),
+            );
           } else if (state is FavoritesLoaded) {
             return CustomScrollView(
               slivers: [
@@ -86,32 +88,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                 ),
                 if (state.favorites.isEmpty)
-                  SliverFillRemaining(
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.favorite_border_rounded,
-                            size: 64,
-                            color: Theme.of(context).colorScheme.outlineVariant,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No favorites yet',
-                            style: AppTextStyles.titleMedium.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Wallpapers you love will appear here.',
-                            style: AppTextStyles.bodyMedium,
-                          ),
-                        ],
-                      ),
+                SliverFillRemaining(
+                  child: EtherealEmpty(
+                    icon: Icons.favorite_border_rounded,
+                    title: 'No favorites yet',
+                    message: 'Wallpapers you love will appear here.',
+                    action: FilledButton(
+                      onPressed: () => context.go('/'),
+                      child: const Text('Explore Wallpapers'),
                     ),
-                  )
+                  ),
+                )
                 else
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),

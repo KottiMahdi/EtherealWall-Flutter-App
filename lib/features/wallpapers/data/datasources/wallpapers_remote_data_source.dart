@@ -38,10 +38,7 @@ class WallpapersRemoteDataSourceImpl implements WallpapersRemoteDataSource {
           .map((e) => WallpaperModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } on DioException catch (e) {
-      throw ServerException(
-        message:
-            e.response?.data['error'] ?? e.message ?? 'Unexpected server error',
-      );
+      throw _handleDioException(e);
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -69,10 +66,7 @@ class WallpapersRemoteDataSourceImpl implements WallpapersRemoteDataSource {
           )
           .toList();
     } on DioException catch (e) {
-      throw ServerException(
-        message:
-            e.response?.data['error'] ?? e.message ?? 'Unexpected server error',
-      );
+      throw _handleDioException(e);
     } catch (e) {
       throw ServerException(message: e.toString());
     }
@@ -84,12 +78,35 @@ class WallpapersRemoteDataSourceImpl implements WallpapersRemoteDataSource {
       final response = await client.get('/photos/$id');
       return WallpaperModel.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw ServerException(
-        message:
-            e.response?.data['error'] ?? e.message ?? 'Unexpected server error',
-      );
+      throw _handleDioException(e);
     } catch (e) {
       throw ServerException(message: e.toString());
     }
+  }
+
+  ServerException _handleDioException(DioException e) {
+    String message = 'An unexpected error occurred';
+
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        message = 'Connection timed out. Please check your internet.';
+        break;
+      case DioExceptionType.badResponse:
+        message = e.response?.data['error'] ??
+            'Server error (${e.response?.statusCode})';
+        break;
+      case DioExceptionType.connectionError:
+        message = 'No internet connection. Please check your network.';
+        break;
+      case DioExceptionType.cancel:
+        message = 'Request cancelled';
+        break;
+      default:
+        message = e.message ?? 'Something went wrong';
+    }
+
+    return ServerException(message: message);
   }
 }

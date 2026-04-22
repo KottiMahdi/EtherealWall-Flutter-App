@@ -11,6 +11,7 @@ import '../cubit/wallpaper_cubit.dart';
 import '../cubit/wallpaper_state.dart';
 import '../widgets/editorial_collections_grid.dart';
 import '../widgets/editorial_wallpaper_card.dart';
+import '../../../../core/widgets/state_widgets.dart';
 
 class CategoryScreen extends StatefulWidget {
   final String category;
@@ -150,12 +151,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
     return BlocBuilder<WallpaperCubit, WallpaperState>(
       builder: (context, state) {
         if (state is WallpaperLoading) {
-          return const SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator.adaptive()),
-          );
+          return const SliverFillRemaining(child: EtherealLoading());
         } else if (state is WallpaperError) {
-          return SliverFillRemaining(child: Center(child: Text(state.message)));
+          return SliverFillRemaining(
+            child: EtherealError(
+              message: state.message,
+              onRetry: () => _onCategoryTap(context, _selectedCategory!),
+            ),
+          );
         } else if (state is WallpaperLoaded) {
+          if (state.wallpapers.isEmpty) {
+            return const SliverFillRemaining(
+              child: EtherealEmpty(
+                message: 'No wallpapers found in this category.',
+              ),
+            );
+          }
           return SliverPadding(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 160),
             sliver: SliverGrid(
