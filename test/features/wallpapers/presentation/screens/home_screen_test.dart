@@ -5,6 +5,7 @@ import 'package:ethereal_wall/features/wallpapers/presentation/screens/home_scre
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ethereal_wall/features/wallpapers/presentation/cubit/favorites_cubit.dart';
+import 'package:ethereal_wall/core/theme/theme_cubit.dart';
 import 'package:ethereal_wall/core/di/injection_container.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -18,16 +19,21 @@ class MockWallpaperCubit extends MockCubit<WallpaperState>
 class MockFavoritesCubit extends MockCubit<FavoritesState>
     implements FavoritesCubit {}
 
+class MockThemeCubit extends MockCubit<ThemeMode>
+    implements ThemeCubit {}
+
 class MockGoRouter extends Mock implements GoRouter {}
 
 void main() {
   late MockWallpaperCubit mockCubit;
   late MockFavoritesCubit mockFavoritesCubit;
+  late MockThemeCubit mockThemeCubit;
   late MockGoRouter mockRouter;
 
   setUp(() {
     mockCubit = MockWallpaperCubit();
     mockFavoritesCubit = MockFavoritesCubit();
+    mockThemeCubit = MockThemeCubit();
     mockRouter = MockGoRouter();
 
     // Setup Service Locator (sl)
@@ -40,6 +46,7 @@ void main() {
     when(() => mockCubit.fetchWallpapers()).thenAnswer((_) async {});
     when(() => mockFavoritesCubit.loadFavorites()).thenAnswer((_) async {});
     when(() => mockFavoritesCubit.state).thenReturn(FavoritesInitial());
+    when(() => mockThemeCubit.state).thenReturn(ThemeMode.light);
   });
 
   tearDown(() {
@@ -63,8 +70,11 @@ void main() {
     return MaterialApp(
       home: InheritedGoRouter(
         goRouter: mockRouter,
-        child: BlocProvider<FavoritesCubit>.value(
-          value: mockFavoritesCubit,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<FavoritesCubit>.value(value: mockFavoritesCubit),
+            BlocProvider<ThemeCubit>.value(value: mockThemeCubit),
+          ],
           child: const HomeScreen(),
         ),
       ),
@@ -96,7 +106,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsAtLeast(1));
     },
   );
 

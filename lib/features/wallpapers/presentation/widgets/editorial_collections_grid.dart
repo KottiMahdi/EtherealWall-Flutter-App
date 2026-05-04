@@ -8,39 +8,49 @@ class EditorialCollectionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildCard(allCategories[0], 1.5),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(child: _buildCard(allCategories[1], 0.85)),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: _buildCard(allCategories[2], 0.85),
-              ),
+    List<Widget> children = [];
+    
+    for (int i = 0; i < allCategories.length; i++) {
+      // Pattern: Full width (1.5), then two half-width (0.85), then full width (2.2), etc.
+      // We'll create a repeating pattern to keep it interesting.
+      int patternIndex = i % 4;
+      
+      if (patternIndex == 0) {
+        // Full width wide
+        children.add(_buildCard(allCategories[i], 1.5));
+        children.add(const SizedBox(height: 20));
+      } else if (patternIndex == 1) {
+        // Start of a row with two cards
+        if (i + 1 < allCategories.length) {
+          children.add(
+            Row(
+              children: [
+                Expanded(child: _buildCard(allCategories[i], 0.85)),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 40),
+                    child: _buildCard(allCategories[i + 1], 0.85),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        _buildCard(allCategories[3], 2.2),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 40),
-                child: _buildCard(allCategories[4], 0.85),
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(child: _buildCard(allCategories[5], 0.85)),
-          ],
-        ),
-      ],
-    );
+          );
+          children.add(const SizedBox(height: 20));
+          i++; // Skip the next one as we included it here
+        } else {
+          // Fallback if it's the last one
+          children.add(_buildCard(allCategories[i], 1.5));
+          children.add(const SizedBox(height: 20));
+        }
+      } else if (patternIndex == 3) {
+        // Extra tall full width
+        children.add(_buildCard(allCategories[i], 2.2));
+        children.add(const SizedBox(height: 20));
+      }
+    }
+
+    return Column(children: children);
   }
 
   Widget _buildCard(CategoryData cat, double ratio) {

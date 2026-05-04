@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/entities/wallpaper.dart';
 import '../cubit/favorites_cubit.dart';
@@ -32,7 +31,7 @@ class WallpaperGridItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(
                   16,
                 ), // 'lg' in design is 32px, but let's use 16px as in standard rounded-lg
-                color: AppColors.surfaceContainerLow,
+                color: Theme.of(context).colorScheme.surfaceContainerLow,
               ),
               clipBehavior: Clip.antiAlias,
               child: Stack(
@@ -42,9 +41,9 @@ class WallpaperGridItem extends StatelessWidget {
                     imageUrl: wallpaper.thumbnailUrl,
                     fit: BoxFit.cover,
                     placeholder: (context, url) =>
-                        Container(color: AppColors.surfaceContainerHighest),
+                        Container(color: Theme.of(context).colorScheme.surfaceContainerHighest),
                     errorWidget: (context, url, error) => Container(
-                      color: AppColors.surfaceContainerHighest,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                       child: Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -52,7 +51,7 @@ class WallpaperGridItem extends StatelessWidget {
                             Icon(
                               Icons.broken_image_rounded,
                               size: 32,
-                              color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                             ),
                           ],
                         ),
@@ -82,7 +81,7 @@ class WallpaperGridItem extends StatelessWidget {
                             child: Icon(
                               isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                               size: 16,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
                         );
@@ -107,7 +106,7 @@ class WallpaperGridItem extends StatelessWidget {
             wallpaper.photographer,
             style: AppTextStyles.bodySmall.copyWith(
               fontSize: 12,
-              color: AppColors.onSurfaceVariant,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

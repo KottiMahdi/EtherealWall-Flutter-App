@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 
 class EditorialWallpaperCard extends StatelessWidget {
@@ -40,14 +39,14 @@ class EditorialWallpaperCard extends StatelessWidget {
               imageUrl: imageUrl,
               fit: BoxFit.cover,
               placeholder: (_, __) =>
-                  Container(color: AppColors.surfaceContainerHigh),
+                  Container(color: Theme.of(context).colorScheme.surfaceContainerHigh),
               errorWidget: (context, url, error) => Container(
-                color: AppColors.surfaceContainerHigh,
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
                 child: Center(
                   child: Icon(
                     Icons.broken_image_rounded,
                     size: 40,
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.3),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                   ),
                 ),
               ),

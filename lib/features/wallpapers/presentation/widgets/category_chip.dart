@@ -22,13 +22,13 @@ class CategoryChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          color: isSelected ? AppColors.primary : AppColors.surfaceContainerLow,
+          color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceContainerLow,
           gradient: isSelected ? AppColors.primaryGradient : null,
         ),
         child: Text(
           label,
           style: AppTextStyles.labelLarge.copyWith(
-            color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
+            color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),

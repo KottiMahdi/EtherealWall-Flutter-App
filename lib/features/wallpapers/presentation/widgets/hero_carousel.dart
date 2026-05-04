@@ -65,8 +65,8 @@ class _HeroCarouselState extends State<HeroCarousel> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             color: _currentIndex == index
-                ? AppColors.primary
-                : AppColors.outlineVariant.withValues(alpha: 0.5),
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
         );
       }),
@@ -80,7 +80,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: AppColors.surfaceContainerLow,
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
           boxShadow: AppColors.editorialShadow,
         ),
         clipBehavior: Clip.antiAlias,
@@ -91,9 +91,9 @@ class _HeroCarouselState extends State<HeroCarousel> {
                 imageUrl: wallpaper.imageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) =>
-                    Container(color: AppColors.surfaceContainerLow),
+                    Container(color: Theme.of(context).colorScheme.surfaceContainerLow),
                 errorWidget: (context, url, error) => Container(
-                  color: AppColors.surfaceContainerLow,
+                  color: Theme.of(context).colorScheme.surfaceContainerLow,
                   child: Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -101,13 +101,13 @@ class _HeroCarouselState extends State<HeroCarousel> {
                         Icon(
                           Icons.broken_image_rounded,
                           size: 48,
-                          color: AppColors.onSurfaceVariant.withValues(alpha: 0.3),
+                          color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                         ),
                         const SizedBox(height: 12),
                         Text(
                           'Failed to load image',
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                            color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                           ),
                         ),
                       ],

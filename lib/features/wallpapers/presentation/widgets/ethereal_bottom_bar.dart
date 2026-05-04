@@ -32,7 +32,7 @@ class EtherealBottomBar extends StatelessWidget {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.background.withValues(alpha: 0.8),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
                   borderRadius: BorderRadius.circular(100),
                   boxShadow: AppColors.editorialShadow,
                 ),

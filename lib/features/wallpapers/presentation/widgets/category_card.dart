@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../domain/entities/category_data.dart';
 
@@ -55,7 +54,7 @@ class _CategoryCardState extends State<CategoryCard> {
                   imageUrl: widget.category.imageUrl,
                   fit: BoxFit.cover,
                   placeholder:
-                      (_, __) => Container(color: AppColors.surfaceContainerHigh),
+                      (_, __) => Container(color: Theme.of(context).colorScheme.surfaceContainerHigh),
                 ),
                 Positioned.fill(
                   child: DecoratedBox(
@@ -113,7 +112,7 @@ class _CategoryCardState extends State<CategoryCard> {
                         style: AppTextStyles.headlineMedium.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w900,
-                          fontSize: widget.aspectRatio > 1.2 ? 32 : 24,
+                          fontSize: widget.aspectRatio > 1.2 ? 26 : 18,
                           letterSpacing: -0.5,
                         ),
                       ),

@@ -2,11 +2,11 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../cubit/favorites_cubit.dart';
 import '../widgets/wallpaper_grid_item.dart';
 import '../../../../core/widgets/state_widgets.dart';
+import '../../../../core/theme/theme_cubit.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -33,13 +33,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: AppBar(
-              backgroundColor: AppColors.background.withValues(alpha: 0.7),
+              backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
               elevation: 0,
               automaticallyImplyLeading: false,
               title: Text(
                 'EtherealWalls',
                 style: AppTextStyles.headlineMedium.copyWith(
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -1.2,
                 ),
@@ -48,7 +48,25 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.search_rounded),
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                   onPressed: () {},
+                ),
+                BlocBuilder<ThemeCubit, ThemeMode>(
+                  builder: (context, themeMode) {
+                    return IconButton(
+                      icon: Icon(
+                        themeMode == ThemeMode.dark
+                            ? Icons.light_mode_rounded
+                            : Icons.dark_mode_rounded,
+                      ),
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
+                      onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                    );
+                  },
                 ),
                 const SizedBox(width: 8),
               ],

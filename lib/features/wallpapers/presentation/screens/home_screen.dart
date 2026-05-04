@@ -2,8 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/di/injection_container.dart';
 
@@ -12,6 +10,7 @@ import '../cubit/wallpaper_state.dart';
 import '../widgets/hero_carousel.dart';
 import '../widgets/wallpapers_masonry_grid.dart';
 import '../../../../core/widgets/state_widgets.dart';
+import '../../../../core/theme/theme_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -90,18 +89,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   PreferredSizeWidget _buildAppBar() {
+    final Color iconColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
     return PreferredSize(
       preferredSize: const Size.fromHeight(72),
       child: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
           child: AppBar(
-            backgroundColor: AppColors.background.withValues(alpha: 0.7),
+            backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
             elevation: 0,
             title: Text(
               'EtherealWalls',
               style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.primary,
+                color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w900,
                 letterSpacing: -1.2,
               ),
@@ -110,7 +113,21 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.search_rounded),
+                color: iconColor,
                 onPressed: () {},
+              ),
+              BlocBuilder<ThemeCubit, ThemeMode>(
+                builder: (context, themeMode) {
+                  return IconButton(
+                    icon: Icon(
+                      themeMode == ThemeMode.dark
+                          ? Icons.light_mode_rounded
+                          : Icons.dark_mode_rounded,
+                    ),
+                    color: iconColor,
+                    onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                  );
+                },
               ),
               const SizedBox(width: 8),
             ],
