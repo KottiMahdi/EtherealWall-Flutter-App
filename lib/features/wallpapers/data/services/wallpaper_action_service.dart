@@ -40,11 +40,29 @@ class WallpaperActionService {
       await _dio.download(imageUrl, tempPath);
       tempFile = File(tempPath);
 
-      final bool result = await AsyncWallpaper.setWallpaperFromFile(
-        filePath: tempFile.path,
-        wallpaperLocation: location,
-        goToHome: false,
-      );
+      final bool result;
+      if (target == WallpaperTargetType.both) {
+        // Set home first
+        await AsyncWallpaper.setWallpaperFromFile(
+          filePath: tempFile.path,
+          wallpaperLocation: AsyncWallpaper.HOME_SCREEN,
+          goToHome: false,
+        );
+        // Small delay to let system breathe
+        await Future.delayed(const Duration(milliseconds: 200));
+        // Set lock screen
+        result = await AsyncWallpaper.setWallpaperFromFile(
+          filePath: tempFile.path,
+          wallpaperLocation: AsyncWallpaper.LOCK_SCREEN,
+          goToHome: false,
+        );
+      } else {
+        result = await AsyncWallpaper.setWallpaperFromFile(
+          filePath: tempFile.path,
+          wallpaperLocation: location,
+          goToHome: false,
+        );
+      }
 
       return result;
     } catch (e) {
