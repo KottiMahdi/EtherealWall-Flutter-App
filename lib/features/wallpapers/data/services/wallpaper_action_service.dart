@@ -41,28 +41,14 @@ class WallpaperActionService {
       tempFile = File(tempPath);
 
       final bool result;
-      if (target == WallpaperTargetType.both) {
-        // Set home first
-        await AsyncWallpaper.setWallpaperFromFile(
-          filePath: tempFile.path,
-          wallpaperLocation: AsyncWallpaper.HOME_SCREEN,
-          goToHome: false,
-        );
-        // Small delay to let system breathe
-        await Future.delayed(const Duration(milliseconds: 200));
-        // Set lock screen
-        result = await AsyncWallpaper.setWallpaperFromFile(
-          filePath: tempFile.path,
-          wallpaperLocation: AsyncWallpaper.LOCK_SCREEN,
-          goToHome: false,
-        );
-      } else {
-        result = await AsyncWallpaper.setWallpaperFromFile(
-          filePath: tempFile.path,
-          wallpaperLocation: location,
-          goToHome: false,
-        );
-      }
+      result = await AsyncWallpaper.setWallpaperFromFile(
+        filePath: tempFile.path,
+        wallpaperLocation: location,
+        goToHome: false,
+      );
+
+      // Give the system a moment to process the change and potentially restart the activity
+      await Future.delayed(const Duration(milliseconds: 500));
 
       return result;
     } catch (e) {

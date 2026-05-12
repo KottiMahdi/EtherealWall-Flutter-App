@@ -26,6 +26,7 @@ class EtherealWallApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, themeMode) {
         return MaterialApp.router(
@@ -35,6 +36,7 @@ class EtherealWallApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           themeMode: themeMode,
           routerConfig: AppRouter.router,
+          
         );
       },
     );
