@@ -33,7 +33,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+              backgroundColor: Theme.of(
+                context,
+              ).colorScheme.surface.withValues(alpha: 0.7),
               elevation: 0,
               automaticallyImplyLeading: false,
               title: Text(
@@ -51,7 +53,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white
                       : Colors.black,
-                  onPressed: () {},
+                  onPressed: () => context.push('/search'),
                 ),
                 BlocBuilder<ThemeCubit, ThemeMode>(
                   builder: (context, themeMode) {
@@ -106,28 +108,28 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                 ),
                 if (state.favorites.isEmpty)
-                SliverFillRemaining(
-                  child: EtherealEmpty(
-                    icon: Icons.favorite_border_rounded,
-                    title: 'No favorites yet',
-                    message: 'Wallpapers you love will appear here.',
-                    action: FilledButton(
-                      onPressed: () => context.go('/'),
-                      child: const Text('Explore Wallpapers'),
+                  SliverFillRemaining(
+                    child: EtherealEmpty(
+                      icon: Icons.favorite_border_rounded,
+                      title: 'No favorites yet',
+                      message: 'Wallpapers you love will appear here.',
+                      action: FilledButton(
+                        onPressed: () => context.go('/'),
+                        child: const Text('Explore Wallpapers'),
+                      ),
                     ),
-                  ),
-                )
+                  )
                 else
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
                     sliver: SliverGrid(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.65,
-                      ),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                            childAspectRatio: 0.65,
+                          ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) => WallpaperGridItem(
                           wallpaper: state.favorites[index],

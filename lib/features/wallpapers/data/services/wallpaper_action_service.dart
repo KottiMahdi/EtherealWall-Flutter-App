@@ -4,11 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
 
-enum WallpaperTargetType {
-  home,
-  lock,
-  both,
-}
+enum WallpaperTargetType { home, lock, both }
 
 class WallpaperActionService {
   final Dio _dio;
@@ -36,16 +32,28 @@ class WallpaperActionService {
 
       // Download manually to avoid system activity restarts
       final tempDir = await getTemporaryDirectory();
-      final tempPath = '${tempDir.path}/wallpaper_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final tempPath =
+          '${tempDir.path}/wallpaper_${DateTime.now().millisecondsSinceEpoch}.jpg';
       await _dio.download(imageUrl, tempPath);
       tempFile = File(tempPath);
 
       final bool result;
-      result = await AsyncWallpaper.setWallpaperFromFile(
-        filePath: tempFile.path,
-        wallpaperLocation: location,
-        goToHome: false,
-      );
+
+      if (target == WallpaperTargetType.lock) {
+        // Lock screen can be applied directly without forcing the home launcher to refresh.
+        result = await AsyncWallpaper.setWallpaperFromFile(
+          filePath: tempFile.path,
+          wallpaperLocation: location,
+          goToHome: false,
+        );
+      } else {
+        // Home and both wallpaper changes often trigger a launcher redraw or reload.
+        // The safer professional UX is to open the native wallpaper chooser for these cases.
+        result = await AsyncWallpaper.setWallpaperFromFileNative(
+          filePath: tempFile.path,
+          goToHome: false,
+        );
+      }
 
       // Give the system a moment to process the change and potentially restart the activity
       await Future.delayed(const Duration(milliseconds: 500));

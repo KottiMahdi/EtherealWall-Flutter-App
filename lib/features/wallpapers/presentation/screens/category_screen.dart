@@ -91,7 +91,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
-                  child: SizedBox(height: _selectedCategory == null ? 120 : 140),
+                  child: SizedBox(
+                    height: _selectedCategory == null ? 120 : 140,
+                  ),
                 ),
                 if (_selectedCategory == null) ...[
                   _buildHeader(
@@ -193,7 +195,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               IconButton(
                 icon: const Icon(Icons.search_rounded),
                 color: iconColor,
-                onPressed: () {},
+                onPressed: () => context.push('/search'),
               ),
               BlocBuilder<ThemeCubit, ThemeMode>(
                 builder: (context, themeMode) {

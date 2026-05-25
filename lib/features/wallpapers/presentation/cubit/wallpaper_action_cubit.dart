@@ -5,7 +5,8 @@ import 'wallpaper_action_state.dart';
 class WallpaperActionCubit extends Cubit<WallpaperActionState> {
   final WallpaperActionService _wallpaperService;
 
-  WallpaperActionCubit(this._wallpaperService) : super(WallpaperActionInitial());
+  WallpaperActionCubit(this._wallpaperService)
+    : super(WallpaperActionInitial());
 
   Future<void> setWallpaper({
     required String imageUrl,
@@ -23,7 +24,11 @@ class WallpaperActionCubit extends Cubit<WallpaperActionState> {
     if (success) {
       emit(const WallpaperActionSuccess('Wallpaper set successfully!'));
     } else {
-      emit(const WallpaperActionFailure('Failed to set wallpaper. Please try again.'));
+      emit(
+        const WallpaperActionFailure(
+          'Failed to set wallpaper. Please try again.',
+        ),
+      );
     }
   }
 }

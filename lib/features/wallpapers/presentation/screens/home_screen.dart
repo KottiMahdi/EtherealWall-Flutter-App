@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/di/injection_container.dart';
@@ -99,7 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
           child: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+            backgroundColor: Theme.of(
+              context,
+            ).colorScheme.surface.withValues(alpha: 0.7),
             elevation: 0,
             title: Text(
               'EtherealWalls',
@@ -114,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 icon: const Icon(Icons.search_rounded),
                 color: iconColor,
-                onPressed: () {},
+                onPressed: () => context.push('/search'),
               ),
               BlocBuilder<ThemeCubit, ThemeMode>(
                 builder: (context, themeMode) {

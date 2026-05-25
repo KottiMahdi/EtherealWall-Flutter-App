@@ -5,12 +5,17 @@ import '../../features/wallpapers/domain/entities/wallpaper.dart';
 import '../../features/wallpapers/presentation/screens/category_screen.dart';
 import '../../features/wallpapers/presentation/screens/favorites_screen.dart';
 import '../../features/wallpapers/presentation/screens/home_screen.dart';
+import '../../features/wallpapers/presentation/screens/search_screen.dart';
 import '../../features/wallpapers/presentation/screens/preview_screen.dart';
 import 'main_shell.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/di/injection_container.dart';
+import '../../features/wallpapers/presentation/cubit/wallpaper_cubit.dart';
 
 abstract class AppRouter {
   static const String home = '/';
   static const String category = '/category/:name';
+  static const String search = '/search';
   static const String preview = '/preview';
   static const String favorites = '/favorites';
 
@@ -20,10 +25,7 @@ abstract class AppRouter {
     routes: [
       ShellRoute(
         builder: (context, state, child) {
-          return MainShell(
-            stateUri: state.uri.toString(),
-            child: child,
-          );
+          return MainShell(stateUri: state.uri.toString(), child: child);
         },
         routes: [
           GoRoute(
@@ -36,16 +38,21 @@ abstract class AppRouter {
             name: 'category',
             builder: (context, state) {
               final name = state.pathParameters['name']!;
-              return CategoryScreen(
-                key: ValueKey(name),
-                category: name,
-              );
+              return CategoryScreen(key: ValueKey(name), category: name);
             },
           ),
           GoRoute(
             path: favorites,
             name: 'favorites',
             builder: (context, state) => const FavoritesScreen(),
+          ),
+          GoRoute(
+            path: search,
+            name: 'search',
+            builder: (context, state) => BlocProvider(
+              create: (_) => sl<WallpaperCubit>(),
+              child: const SearchScreen(),
+            ),
           ),
         ],
       ),
