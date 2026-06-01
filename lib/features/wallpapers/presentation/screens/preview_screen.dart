@@ -416,7 +416,10 @@ class PreviewScreen extends StatelessWidget {
     required String message,
     bool success = true,
   }) {
-    showGeneralDialog(
+    final navigator = Navigator.of(context, rootNavigator: true);
+    var isDialogOpen = true;
+
+    showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Wallpaper action result',
@@ -523,11 +526,11 @@ class PreviewScreen extends StatelessWidget {
           ),
         );
       },
-    );
+    ).whenComplete(() => isDialogOpen = false);
 
     Future.delayed(const Duration(seconds: 2), () {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
+      if (isDialogOpen && navigator.mounted && navigator.canPop()) {
+        navigator.pop();
       }
     });
   }

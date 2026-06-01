@@ -16,7 +16,9 @@ class EtherealLoading extends StatelessWidget {
             height: 48,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
+              ),
             ),
           ),
           if (message != null) ...[
@@ -49,7 +51,7 @@ class EtherealError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Padding(
       padding: const EdgeInsets.all(32.0),
       child: Center(
@@ -106,7 +108,7 @@ class EtherealError extends StatelessWidget {
   }
 
   String _getFriendlyTitle(String message) {
-    if (message.toLowerCase().contains('connection') || 
+    if (message.toLowerCase().contains('connection') ||
         message.toLowerCase().contains('internet')) {
       return 'Connection Lost';
     }
@@ -139,7 +141,9 @@ class EtherealEmpty extends StatelessWidget {
             Icon(
               icon ?? Icons.inbox_outlined,
               size: 80,
-              color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 24),
             Text(
@@ -157,11 +161,58 @@ class EtherealEmpty extends StatelessWidget {
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            if (action != null) ...[
-              const SizedBox(height: 32),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: 32), action!],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class SliverPaginationFooter extends StatelessWidget {
+  final bool isLoading;
+  final String? errorMessage;
+  final VoidCallback? onRetry;
+  final double bottomPadding;
+
+  const SliverPaginationFooter({
+    super.key,
+    required this.isLoading,
+    this.errorMessage,
+    this.onRetry,
+    this.bottomPadding = 120,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!isLoading && errorMessage == null) {
+      return SliverToBoxAdapter(child: SizedBox(height: bottomPadding));
+    }
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(24, 16, 24, bottomPadding),
+        child: Center(
+          child: isLoading
+              ? SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                )
+              : TextButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: Text(
+                    errorMessage ?? 'Load more',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
         ),
       ),
     );

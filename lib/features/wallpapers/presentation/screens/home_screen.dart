@@ -32,55 +32,61 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, state) {
             return RefreshIndicator(
               onRefresh: () => context.read<WallpaperCubit>().fetchWallpapers(),
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  _handleScroll(context, notification);
+                  return false;
+                },
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
 
-                  // Hero Section
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Daily Muse',
-                            style: AppTextStyles.headlineLarge,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Curated art for your digital sanctuary.',
-                            style: AppTextStyles.bodySmall,
-                          ),
-                          const SizedBox(height: 24),
-                          _buildHeroCarousel(state),
-                          const SizedBox(height: 40),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Gallery Section Header
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 24,
-                      ),
-                      child: Text(
-                        'Trending Now',
-                        style: AppTextStyles.headlineSmall.copyWith(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
+                    // Hero Section
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Daily Muse',
+                              style: AppTextStyles.headlineLarge,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Curated art for your digital sanctuary.',
+                              style: AppTextStyles.bodySmall,
+                            ),
+                            const SizedBox(height: 24),
+                            _buildHeroCarousel(state),
+                            const SizedBox(height: 40),
+                          ],
                         ),
                       ),
                     ),
-                  ),
 
-                  // Masonry Grid
-                  _buildGallery(state),
-                ],
+                    // Gallery Section Header
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 24,
+                        ),
+                        child: Text(
+                          'Trending Now',
+                          style: AppTextStyles.headlineSmall.copyWith(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Masonry Grid
+                    ..._buildGallery(context, state),
+                  ],
+                ),
               ),
             );
           },
@@ -147,22 +153,52 @@ class _HomeScreenState extends State<HomeScreen> {
     return const EtherealLoading();
   }
 
-  Widget _buildGallery(WallpaperState state) {
-    if (state is WallpaperLoaded) {
-      return WallpapersMasonryGrid(wallpapers: state.wallpapers);
-    } else if (state is WallpaperError) {
-      return SliverFillRemaining(
-        child: EtherealError(
-          message: state.message,
-          onRetry: () => context.read<WallpaperCubit>().fetchWallpapers(),
-        ),
-      );
+  void _handleScroll(BuildContext context, ScrollNotification notification) {
+    if (notification.metrics.axis != Axis.vertical) return;
+    if (notification.metrics.extentAfter < 600) {
+      context.read<WallpaperCubit>().fetchWallpapers(loadMore: true);
     }
-    return const SliverToBoxAdapter(
-      child: Padding(
-        padding: EdgeInsets.only(top: 100),
-        child: EtherealLoading(),
+  }
+
+  List<Widget> _buildGallery(BuildContext context, WallpaperState state) {
+    if (state is WallpaperLoaded) {
+      if (state.wallpapers.isEmpty) {
+        return const [
+          SliverFillRemaining(
+            child: EtherealEmpty(message: 'No wallpapers found.'),
+          ),
+        ];
+      }
+
+      return [
+        WallpapersMasonryGrid(
+          wallpapers: state.wallpapers,
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        ),
+        SliverPaginationFooter(
+          isLoading: state.isLoadingMore,
+          errorMessage: state.loadMoreError,
+          onRetry: () =>
+              context.read<WallpaperCubit>().fetchWallpapers(loadMore: true),
+        ),
+      ];
+    } else if (state is WallpaperError) {
+      return [
+        SliverFillRemaining(
+          child: EtherealError(
+            message: state.message,
+            onRetry: () => context.read<WallpaperCubit>().fetchWallpapers(),
+          ),
+        ),
+      ];
+    }
+    return const [
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.only(top: 100),
+          child: EtherealLoading(),
+        ),
       ),
-    );
+    ];
   }
 }

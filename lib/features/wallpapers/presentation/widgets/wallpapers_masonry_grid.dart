@@ -6,13 +6,18 @@ import 'wallpaper_grid_item.dart';
 
 class WallpapersMasonryGrid extends StatelessWidget {
   final List<Wallpaper> wallpapers;
+  final EdgeInsetsGeometry padding;
 
-  const WallpapersMasonryGrid({super.key, required this.wallpapers});
+  const WallpapersMasonryGrid({
+    super.key,
+    required this.wallpapers,
+    this.padding = const EdgeInsets.fromLTRB(24, 0, 24, 120),
+  });
 
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(24, 0, 24, 120),
+      padding: padding,
       sliver: SliverMasonryGrid.count(
         crossAxisCount: 2,
         mainAxisSpacing: 24,
@@ -22,10 +27,7 @@ class WallpapersMasonryGrid extends StatelessWidget {
             aspectRatio: 0.75,
             child: WallpaperGridItem(
               wallpaper: wallpapers[index],
-              onTap: () => context.push(
-                '/preview',
-                extra: wallpapers[index],
-              ),
+              onTap: () => context.push('/preview', extra: wallpapers[index]),
               isStaggered: index % 2 != 0,
             ),
           );

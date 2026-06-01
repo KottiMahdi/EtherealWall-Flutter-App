@@ -32,15 +32,23 @@ class _CategoryScreenState extends State<CategoryScreen> {
     _selectedCategory = widget.category == 'Explore' || widget.category == 'All'
         ? null
         : widget.category;
-    _scrollController.addListener(_onScroll);
   }
 
-  void _onScroll() {
-    if (_scrollController.hasClients && _selectedCategory != null) {
-      if (_scrollController.offset > 60 && !_showAppBarTitle) {
+  void _handleScroll(BuildContext context, ScrollNotification notification) {
+    if (notification.metrics.axis != Axis.vertical) return;
+
+    if (_selectedCategory != null) {
+      if (notification.metrics.pixels > 60 && !_showAppBarTitle) {
         setState(() => _showAppBarTitle = true);
-      } else if (_scrollController.offset <= 60 && _showAppBarTitle) {
+      } else if (notification.metrics.pixels <= 60 && _showAppBarTitle) {
         setState(() => _showAppBarTitle = false);
+      }
+
+      if (notification.metrics.extentAfter < 600) {
+        context.read<WallpaperCubit>().fetchWallpapersByCategory(
+          _selectedCategory!,
+          loadMore: true,
+        );
       }
     }
   }
@@ -57,11 +65,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
       _showAppBarTitle = false;
     });
     context.read<WallpaperCubit>().fetchWallpapersByCategory(category);
-    _scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -75,50 +85,63 @@ class _CategoryScreenState extends State<CategoryScreen> {
         return cubit;
       },
       child: Builder(
-        builder: (context) => Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: _buildAppBar(context),
-          body: RefreshIndicator(
-            onRefresh: () async {
-              if (_selectedCategory != null) {
-                await context.read<WallpaperCubit>().fetchWallpapersByCategory(
-                  _selectedCategory!,
-                );
-              }
-            },
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: _selectedCategory == null ? 120 : 140,
-                  ),
-                ),
-                if (_selectedCategory == null) ...[
-                  _buildHeader(
-                    'Explore',
-                    'Curated collections for your home screen.',
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 160),
-                    sliver: SliverToBoxAdapter(
-                      child: EditorialCollectionsGrid(
-                        onCategoryTap: (cat) => _onCategoryTap(context, cat),
-                      ),
+        builder: (context) {
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: _buildAppBar(context),
+            body: BlocBuilder<WallpaperCubit, WallpaperState>(
+              builder: (context, state) {
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    if (_selectedCategory != null) {
+                      await context
+                          .read<WallpaperCubit>()
+                          .fetchWallpapersByCategory(_selectedCategory!);
+                    }
+                  },
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      _handleScroll(context, notification);
+                      return false;
+                    },
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: SizedBox(
+                            height: _selectedCategory == null ? 120 : 140,
+                          ),
+                        ),
+                        if (_selectedCategory == null) ...[
+                          _buildHeader(
+                            'Explore',
+                            'Curated collections for your home screen.',
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 160),
+                            sliver: SliverToBoxAdapter(
+                              child: EditorialCollectionsGrid(
+                                onCategoryTap: (cat) =>
+                                    _onCategoryTap(context, cat),
+                              ),
+                            ),
+                          ),
+                        ] else ...[
+                          _buildHeader(
+                            _selectedCategory!,
+                            _getCategoryDesc(_selectedCategory!),
+                          ),
+                          ..._buildWallpaperSlivers(context, state),
+                        ],
+                      ],
                     ),
                   ),
-                ] else ...[
-                  _buildHeader(
-                    _selectedCategory!,
-                    _getCategoryDesc(_selectedCategory!),
-                  ),
-                  _buildWallpaperGrid(),
-                ],
-              ],
+                );
+              },
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -218,50 +241,65 @@ class _CategoryScreenState extends State<CategoryScreen> {
     );
   }
 
-  Widget _buildWallpaperGrid() {
-    return BlocBuilder<WallpaperCubit, WallpaperState>(
-      builder: (context, state) {
-        if (state is WallpaperLoading) {
-          return const SliverFillRemaining(child: EtherealLoading());
-        } else if (state is WallpaperError) {
-          return SliverFillRemaining(
-            child: EtherealError(
-              message: state.message,
-              onRetry: () => _onCategoryTap(context, _selectedCategory!),
+  List<Widget> _buildWallpaperSlivers(
+    BuildContext context,
+    WallpaperState state,
+  ) {
+    if (state is WallpaperLoading) {
+      return const [SliverFillRemaining(child: EtherealLoading())];
+    } else if (state is WallpaperError) {
+      return [
+        SliverFillRemaining(
+          child: EtherealError(
+            message: state.message,
+            onRetry: () => _onCategoryTap(context, _selectedCategory!),
+          ),
+        ),
+      ];
+    } else if (state is WallpaperLoaded) {
+      if (state.wallpapers.isEmpty) {
+        return const [
+          SliverFillRemaining(
+            child: EtherealEmpty(
+              message: 'No wallpapers found in this category.',
             ),
-          );
-        } else if (state is WallpaperLoaded) {
-          if (state.wallpapers.isEmpty) {
-            return const SliverFillRemaining(
-              child: EtherealEmpty(
-                message: 'No wallpapers found in this category.',
-              ),
-            );
-          }
-          return SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 160),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.65,
-              ),
-              delegate: SliverChildBuilderDelegate((context, index) {
-                final wallpaper = state.wallpapers[index];
-                return EditorialWallpaperCard(
-                  imageUrl: wallpaper.thumbnailUrl,
-                  title: wallpaper.title,
-                  photographer: wallpaper.photographer,
-                  onTap: () => context.push('/preview', extra: wallpaper),
-                );
-              }, childCount: state.wallpapers.length),
+          ),
+        ];
+      }
+
+      return [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.65,
             ),
-          );
-        }
-        return const SliverToBoxAdapter(child: SizedBox.shrink());
-      },
-    );
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final wallpaper = state.wallpapers[index];
+              return EditorialWallpaperCard(
+                imageUrl: wallpaper.thumbnailUrl,
+                title: wallpaper.title,
+                photographer: wallpaper.photographer,
+                onTap: () => context.push('/preview', extra: wallpaper),
+              );
+            }, childCount: state.wallpapers.length),
+          ),
+        ),
+        SliverPaginationFooter(
+          isLoading: state.isLoadingMore,
+          errorMessage: state.loadMoreError,
+          onRetry: () => context
+              .read<WallpaperCubit>()
+              .fetchWallpapersByCategory(_selectedCategory!, loadMore: true),
+          bottomPadding: 160,
+        ),
+      ];
+    }
+
+    return const [SliverToBoxAdapter(child: SizedBox.shrink())];
   }
 
   Widget _buildHeader(String title, String subtitle) {
