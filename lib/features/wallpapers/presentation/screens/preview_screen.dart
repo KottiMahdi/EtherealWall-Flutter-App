@@ -30,11 +30,11 @@ class PreviewScreen extends StatelessWidget {
           BlocListener<DownloadCubit, DownloadState>(
             listener: (context, state) {
               if (state is DownloadSuccess) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.green,
-                  ),
+                _showActionPopup(
+                  context,
+                  title: 'Wallpaper downloaded',
+                  message: state.message,
+                  success: true,
                 );
               } else if (state is DownloadFailure) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -358,19 +358,11 @@ class PreviewScreen extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Lock screen applies directly. Home and Both use the system wallpaper chooser to avoid launcher refresh.',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
             const SizedBox(height: 24),
             _buildSelectionTile(
               context,
               icon: Icons.home_rounded,
-              title: 'Home Screen (chooser)',
+              title: 'Home Screen',
               onTap: () {
                 Navigator.pop(bottomSheetContext);
                 context.read<WallpaperActionCubit>().setWallpaper(
@@ -394,7 +386,7 @@ class PreviewScreen extends StatelessWidget {
             _buildSelectionTile(
               context,
               icon: Icons.phonelink_setup_rounded,
-              title: 'Both Screens (chooser)',
+              title: 'Both Screens',
               onTap: () {
                 Navigator.pop(bottomSheetContext);
                 context.read<WallpaperActionCubit>().setWallpaper(
